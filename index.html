@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onlyseans · Sponsor Gallery</title>
+    <link rel="preload" as="image" href="./public/images/sean-avatar.jpg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <p class="eyebrow">Sean Cunningham</p>
+        <h1>Onlyseans</h1>
+        <p class="lede">
+          Rolling every sponsor shoutout into one spotlight wall. Fifty frames, all
+          eyes on the same hype man.
+        </p>
+      </div>
+    </header>
+
+    <main>
+      <section class="gallery" aria-label="Sponsor gallery"></section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p>Powered by Sean’s hustle. Gallery auto-updates as we add fresh shots.</p>
+      </div>
+    </footer>
+
+    <script>
+      const GALLERY_SIZE = 50;
+      const gallery = document.querySelector('.gallery');
+      for (let i = 0; i < GALLERY_SIZE; i++) {
+        const figure = document.createElement('figure');
+        figure.innerHTML = `
+          <img src="./public/images/sean-avatar.jpg" alt="Sponsor feature ${i + 1} for Sean" />
+        `;
+        gallery.appendChild(figure);
+      }
+    </script>
+  </body>
+</html>
