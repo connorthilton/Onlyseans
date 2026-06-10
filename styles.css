@@ -31,6 +31,7 @@ html, body {
 }
 .app-header h1 { margin: 0; font-size: 22px; letter-spacing: -0.3px; }
 .subtitle { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.version { color: var(--accent); font-weight: 600; margin-left: 4px; }
 
 .industry-tabs {
   display: flex;
