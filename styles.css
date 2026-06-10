@@ -162,6 +162,7 @@ html, body {
   align-items: flex-end;
   z-index: 30;
 }
+.sheet-backdrop[hidden] { display: none; }
 .sheet {
   width: 100%;
   background: var(--surface);
