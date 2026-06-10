@@ -1,35 +1,22 @@
-# Onlyseans
+# Outreach Dialer
 
-Single-page sponsor gallery for Sean Cunningham. The initial drop is a 50-tile wall
-(5 columns by 10 rows on large screens) that reuses the Instagram avatar across
-all frames until we have more photography to showcase.
+A mobile-first call-list web app for cold-call client outreach (Utah County coupon newsletter).
 
-## Structure
+Open it on your phone, tap a phone number to dial, then log the outcome
+(answered / no answer → interested / not interested + optional note). Companies
+are grouped by industry; an industry is flagged **secured** once you land one
+interested business, so you know to stop dialing that category.
 
-```
-onlyseans/
-├── index.html              # Static markup + JS that injects 50 tiles
-├── styles.css              # Typography + CSS grid styling
-└── public/
-    └── images/
-        └── sean-avatar.jpg # Downloaded from instagram.com/slcsean_31
-```
+## Stack
+- Static HTML/CSS/JS, no build step.
+- Call outcomes saved in the browser via `localStorage`.
+- Data layer is isolated in `app.js` so it can be swapped for a Railway backend later.
 
-## Running locally
+## Files
+- `index.html` — markup
+- `styles.css` — styling
+- `app.js` — UI + localStorage data layer
+- `data.js` — the company list (`window.COMPANIES`)
 
-Open `index.html` directly in a browser or use any static dev server:
-
-```bash
-cd onlyseans
-python3 -m http.server 5173
-# visit http://localhost:5173
-```
-
-## Next steps
-
-- Replace duplicated avatar tiles with real sponsor shots when they become
-  available.
-- Layer in copy modules (CTA, contact, sponsor blurbs) once the gallery order is
-  finalized.
-- Add responsive tweaks for ultra-wide displays if the grid needs more breathing
-  room beyond 5×10.
+## Run locally
+Just open `index.html`, or serve the folder (e.g. `python -m http.server`).
