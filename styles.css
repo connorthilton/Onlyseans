@@ -33,6 +33,55 @@ html, body {
 .subtitle { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
 .version { color: var(--accent); font-weight: 600; margin-left: 4px; }
 
+.view-switcher {
+  display: flex;
+  gap: 6px;
+  padding: 4px 14px 8px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 5;
+}
+.view-btn {
+  flex: 1;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.view-btn.active { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+.view-btn .count {
+  display: inline-block;
+  min-width: 18px;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 11px;
+}
+.view-btn.active .count { background: var(--accent); color: #fff; }
+
+.group-header {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 16px 4px 8px;
+}
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 48px 20px;
+}
+
 .industry-tabs {
   display: flex;
   gap: 8px;
