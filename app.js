@@ -1,6 +1,6 @@
-// Outreach Dialer — static, localStorage-backed.
-// Data layer is intentionally isolated (loadOutcomes/saveOutcome) so it can be
-// swapped for a Railway backend later without touching the UI.
+// Outreach Dialer — backed by the server API (/api/outcomes), with an
+// in-memory cache so rendering stays synchronous and a localStorage mirror
+// for offline resilience (a dropped signal mid-call never loses a log).
 
 (function () {
   "use strict";
@@ -9,18 +9,54 @@
   var companies = window.COMPANIES || [];
 
   // --- data layer ---------------------------------------------------------
+  // `cache` is the single source of truth the UI reads from. It's filled once
+  // at boot from the server (falling back to localStorage if offline), and
+  // kept in sync on every save.
+  var cache = {};
+
   function loadOutcomes() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    } catch (e) {
-      return {};
-    }
+    return cache;
   }
 
   function saveOutcome(id, outcome) {
-    var all = loadOutcomes();
-    all[id] = Object.assign({}, all[id], outcome, { updated: Date.now() });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    cache[id] = Object.assign({}, cache[id], outcome, { updated: Date.now() });
+    // Mirror locally first so the log survives even if the network drops.
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
+    } catch (e) {}
+    // Persist to the server in the background; localStorage holds it if this
+    // fails and the next successful load will reconcile.
+    fetch("/api/outcomes/" + encodeURIComponent(id), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cache[id])
+    }).catch(function () {});
+  }
+
+  // Load all outcomes once, then hand control to the callback (render).
+  function bootstrap(done) {
+    fetch("/api/outcomes")
+      .then(function (r) {
+        if (!r.ok) throw new Error("bad status");
+        return r.json();
+      })
+      .then(function (data) {
+        cache = data || {};
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
+        } catch (e) {}
+      })
+      .catch(function () {
+        // Server unreachable — fall back to the last known local mirror.
+        try {
+          cache = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch (e) {
+          cache = {};
+        }
+      })
+      .then(function () {
+        done();
+      });
   }
 
   // --- classification -----------------------------------------------------
@@ -333,5 +369,5 @@
     toastTimer = setTimeout(function () { toastEl.hidden = true; }, 1800);
   }
 
-  render();
+  bootstrap(render);
 })();
