@@ -2,7 +2,8 @@
 // `id` must be stable & unique — it's the key used to store call outcomes in localStorage.
 // Industry labels: "Plumbers", "Electricians", "Mechanics", "Restaurants", "Car Washes",
 // "HVAC", "Pest Control", "Lawn Care & Landscaping", "Carpet Cleaning", "Garage Doors",
-// "Roofing & Gutters", "Water Softeners", "Dentists", "Chiropractors".
+// "Roofing & Gutters", "Water Softeners", "Dentists", "Chiropractors",
+// "Real Estate & Mortgage", "Home Security & Smart Home".
 // Utah County businesses. Phone numbers researched from public listings — verify before relying on them.
 window.COMPANIES = [
   // --- Plumbers ---
@@ -223,5 +224,39 @@ window.COMPANIES = [
   { id: "chiropractors-12", industry: "Chiropractors", name: "Doc Rock Stone Chiropractic", phone: "801-794-9494", city: "American Fork", note: "1042 E Bamberger Dr" },
   { id: "chiropractors-13", industry: "Chiropractors", name: "Rosquist Clinic", phone: "801-785-9411", city: "Pleasant Grove", note: "Chiropractic pain management clinic" },
   { id: "chiropractors-14", industry: "Chiropractors", name: "Cook Chiropractic", phone: "801-790-0185", city: "Spanish Fork", note: "Dr. Veloy Cook, natural relief & wellness" },
-  { id: "chiropractors-15", industry: "Chiropractors", name: "Payson Salem Chiropractic", phone: "801-691-1194", city: "Payson", note: "1172 E 100 N Ste 9, Dr. Jon Krogue" }
+  { id: "chiropractors-15", industry: "Chiropractors", name: "Payson Salem Chiropractic", phone: "801-691-1194", city: "Payson", note: "1172 E 100 N Ste 9, Dr. Jon Krogue" },
+
+  // --- Real Estate & Mortgage ---
+  { id: "realestate-1",  industry: "Real Estate & Mortgage", name: "Presidio Real Estate Group", phone: "801-251-6683", city: "Lehi", note: "Local independent brokerage HQ'd in Lehi; luxury & residential" },
+  { id: "realestate-2",  industry: "Real Estate & Mortgage", name: "Zander Real Estate Team", phone: "385-432-5538", city: "Provo", note: "High-volume local agent team" },
+  { id: "realestate-3",  industry: "Real Estate & Mortgage", name: "Ashley Jensen & Associates", phone: "801-830-1717", city: "Provo", note: "Agent team, 2533 N 460 E" },
+  { id: "realestate-4",  industry: "Real Estate & Mortgage", name: "Vision Real Estate", phone: "801-375-6800", city: "Provo", note: "Independent brokerage + property mgmt, 980 W Center St" },
+  { id: "realestate-5",  industry: "Real Estate & Mortgage", name: "Kenny Parcell Team", phone: "801-794-7777", city: "Spanish Fork", note: "Well-known Utah Valley team, 648 N 900 E" },
+  { id: "realestate-6",  industry: "Real Estate & Mortgage", name: "Harvest Park Group", phone: "801-232-3434", city: "Spanish Fork", note: "Local team focused on south Utah County" },
+  { id: "realestate-7",  industry: "Real Estate & Mortgage", name: "Kim Brown - Bill Brown Realty", phone: "801-427-9420", city: "Springville", note: "Owner/principal broker, independent shop at 262 S Main St" },
+  { id: "realestate-8",  industry: "Real Estate & Mortgage", name: "Aren Bybee - Bybee + Co Realty", phone: "801-830-0618", city: "Payson", note: "Team lead serving Payson/Elk Ridge area" },
+  { id: "realestate-9",  industry: "Real Estate & Mortgage", name: "Palomores Properties (Kellie Knowles)", phone: "385-208-3338", city: "Saratoga Springs", note: "Local agent, Saratoga Springs based" },
+  { id: "realestate-10", industry: "Real Estate & Mortgage", name: "Red Sign Real Estate Team", phone: "801-733-7446", city: "Orem", note: "Independent team, 998 N 1200 W" },
+  { id: "realestate-11", industry: "Real Estate & Mortgage", name: "Security Home Mortgage", phone: "866-764-0111", city: "Orem", note: "Local mortgage broker, 576 S State St" },
+  { id: "realestate-12", industry: "Real Estate & Mortgage", name: "First Colony Mortgage (Orem Boulevard)", phone: "801-854-1111", city: "Orem", note: "Utah County-based lender, local branch office" },
+  { id: "realestate-13", industry: "Real Estate & Mortgage", name: "Randy Smith - Equity Real Estate", phone: "801-830-1995", city: "American Fork", note: "Branch broker, Equity Real Estate (Results) office" },
+  { id: "realestate-14", industry: "Real Estate & Mortgage", name: "Stephanie Davis - Presidio Real Estate", phone: "801-367-1174", city: "Spanish Fork", note: "Individual agent serving south Utah County" },
+  { id: "realestate-15", industry: "Real Estate & Mortgage", name: "Denise Martin - Orem's Nicest Realtor", phone: "801-602-9552", city: "Orem", note: "Individual agent who markets herself personally" },
+
+  // --- Home Security & Smart Home ---
+  { id: "homesecurity-1",  industry: "Home Security & Smart Home", name: "Zions Security Alarms", phone: "801-770-2806", city: "American Fork", note: "Local ADT-authorized dealer since 2001; alarms, cameras, monitoring" },
+  { id: "homesecurity-2",  industry: "Home Security & Smart Home", name: "ARCO Lock & Security", phone: "801-374-2986", city: "Provo", note: "Alarm.com systems, smart locks, access control + locksmith; Provo to Lehi" },
+  { id: "homesecurity-3",  industry: "Home Security & Smart Home", name: "Reed's Built-Ins", phone: "801-375-4919", city: "Provo", note: "Family AV/automation shop since 1971; smart home, theater, security" },
+  { id: "homesecurity-4",  industry: "Home Security & Smart Home", name: "Sentinel Systems", phone: "801-233-9233", city: "Provo", note: "Integrator since 2007; IP video surveillance, access control" },
+  { id: "homesecurity-5",  industry: "Home Security & Smart Home", name: "Payson Lock & Key", phone: "801-465-9621", city: "Payson", note: "4K CCTV + access control since 1995; south Utah County" },
+  { id: "homesecurity-6",  industry: "Home Security & Smart Home", name: "Cams Custom AV", phone: "801-735-8056", city: "Springville", note: "Security cameras, theaters, prewiring, whole-home WiFi; all Utah County" },
+  { id: "homesecurity-7",  industry: "Home Security & Smart Home", name: "K2 Home Solutions", phone: "801-362-7070", city: "Lehi", note: "Smart home installs (Ring, cameras, thermostats); founded 2014" },
+  { id: "homesecurity-8",  industry: "Home Security & Smart Home", name: "Onyx Automation", phone: "801-702-9913", city: "Orem", note: "Home automation/AV integrator; works with Utah Valley builders" },
+  { id: "homesecurity-9",  industry: "Home Security & Smart Home", name: "Greenline Home Solutions", phone: "801-344-6691", city: "Lehi", note: "AV/home theater and smart home integrator; UVHBA member" },
+  { id: "homesecurity-10", industry: "Home Security & Smart Home", name: "Alpine Communications", phone: "801-372-2623", city: "Alpine", note: "Low-voltage AV/communications installer; north Utah County" },
+  { id: "homesecurity-11", industry: "Home Security & Smart Home", name: "Harmony Audio", phone: "801-610-9441", city: "Eagle Mountain", note: "Home theater/audio and smart home installs" },
+  { id: "homesecurity-12", industry: "Home Security & Smart Home", name: "Cranked Up Audio Visual", phone: "801-787-9153", city: "Eagle Mountain", note: "AV/home theater installer; Eagle Mtn-Saratoga Springs corridor" },
+  { id: "homesecurity-13", industry: "Home Security & Smart Home", name: "Building Electronic Systems Technology", phone: "801-360-9310", city: "Spanish Fork", note: "BBB-listed security camera installer, south county" },
+  { id: "homesecurity-14", industry: "Home Security & Smart Home", name: "Tri-City Alarm Co", phone: "801-463-3733", city: "Salt Lake City", note: "Independent alarm company with monitoring; serves Provo/Orem" },
+  { id: "homesecurity-15", industry: "Home Security & Smart Home", name: "Argenta Solutions", phone: "801-996-3146", city: "Sandy", note: "Design-build smart home integrator; serves Eagle Mountain" }
 ];
