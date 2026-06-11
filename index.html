@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
   <title>Outreach Dialer</title>
-  <link rel="stylesheet" href="styles.css?v=1.3.1" />
+  <link rel="stylesheet" href="styles.css?v=1.4.0" />
 </head>
 <body>
   <header class="app-header">
     <h1>Outreach Dialer</h1>
-    <p class="subtitle">Utah County &middot; one client per industry <span class="version">v1.3.1</span></p>
+    <p class="subtitle">Utah County &middot; one client per industry <span class="version">v1.4.0</span></p>
   </header>
 
   <nav class="view-switcher" id="viewSwitcher">
@@ -48,8 +48,21 @@
         </div>
       </div>
 
-      <label class="note-label" for="noteInput">Note (optional)</label>
+      <div class="note-history" id="noteHistory" hidden></div>
+
+      <label class="note-label" for="noteInput">Add note (optional)</label>
       <textarea id="noteInput" rows="2" placeholder="Anything worth remembering..."></textarea>
+
+      <label class="note-label">Call back?</label>
+      <div class="chip-row" id="callbackChips">
+        <button class="chip" data-cb="1">1 day</button>
+        <button class="chip" data-cb="2">2 days</button>
+        <button class="chip" data-cb="3">3 days</button>
+        <button class="chip" data-cb="7">1 week</button>
+        <button class="chip" data-cb="custom">Custom…</button>
+      </div>
+      <input type="date" id="callbackDate" class="callback-date" hidden />
+      <p class="callback-current" id="callbackCurrent" hidden></p>
 
       <div class="btn-row">
         <button class="big-btn" id="saveOutcome">Save</button>
@@ -58,7 +71,7 @@
     </div>
   </div>
 
-  <script src="data.js?v=1.3.1"></script>
-  <script src="app.js?v=1.3.1"></script>
+  <script src="data.js?v=1.4.0"></script>
+  <script src="app.js?v=1.4.0"></script>
 </body>
 </html>

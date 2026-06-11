@@ -70,6 +70,41 @@
     return "toCall";
   }
 
+  // --- notes & callbacks ----------------------------------------------------
+  // Notes are an append-only stack of { text, ts }. Older records stored a
+  // single overwritten `note` string — fold that in as the first entry.
+  function notesOf(o) {
+    if (!o) return [];
+    if (o.notes && o.notes.length) return o.notes;
+    if (o.note) return [{ text: o.note, ts: o.updated || 0 }];
+    return [];
+  }
+
+  var DAY = 86400000;
+  function startOfDay(ts) {
+    var d = new Date(ts);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }
+  function startOfToday() { return startOfDay(Date.now()); }
+
+  // null if no callback set; otherwise { due, overdueDays, at }.
+  // A callback is "due" from its day onward — it never silently expires.
+  function callbackState(o) {
+    if (!o || !o.callbackAt) return null;
+    var due = startOfDay(o.callbackAt) <= startOfToday();
+    return {
+      due: due,
+      overdueDays: due ? Math.round((startOfToday() - startOfDay(o.callbackAt)) / DAY) : 0,
+      at: o.callbackAt
+    };
+  }
+
+  function fmtDate(ts) {
+    var d = new Date(ts);
+    return (d.getMonth() + 1) + "/" + d.getDate();
+  }
+
   function industries() {
     var seen = [];
     companies.forEach(function (c) {
@@ -138,6 +173,29 @@
 
     listEl.innerHTML = "";
 
+    // Due callbacks float to the top regardless of industry or status —
+    // this is the follow-up queue, so it includes interested leads too.
+    var due = companies.filter(function (c) {
+      var cb = callbackState(outcomes[c.id]);
+      return cb && cb.due;
+    }).sort(function (a, b) {
+      return outcomes[a.id].callbackAt - outcomes[b.id].callbackAt;
+    });
+
+    if (due.length) {
+      var dueHeader = document.createElement("p");
+      dueHeader.className = "group-header due-header";
+      dueHeader.textContent = "⏰ Due callbacks (" + due.length + ")";
+      listEl.appendChild(dueHeader);
+      due.forEach(function (c) {
+        listEl.appendChild(card(c, outcomes[c.id], { showIndustry: true }));
+      });
+      var listHeader = document.createElement("p");
+      listHeader.className = "group-header";
+      listHeader.textContent = state.active;
+      listEl.appendChild(listHeader);
+    }
+
     if (secured[state.active]) {
       var banner = document.createElement("div");
       banner.className = "secured-banner";
@@ -146,7 +204,10 @@
     }
 
     var pending = companies.filter(function (c) {
-      return c.industry === state.active && viewOf(outcomes[c.id]) === "toCall";
+      var cb = callbackState(outcomes[c.id]);
+      return c.industry === state.active &&
+        viewOf(outcomes[c.id]) === "toCall" &&
+        !(cb && cb.due); // already shown in the due section
     });
 
     if (!pending.length) {
@@ -224,7 +285,7 @@
     return null;
   }
 
-  function card(c, o) {
+  function card(c, o, opts) {
     var el = document.createElement("div");
     el.className = "card" + (o ? " done" : "");
 
@@ -235,7 +296,9 @@
 
     var meta = document.createElement("p");
     meta.className = "meta";
-    meta.textContent = [c.city, c.phone].filter(Boolean).join(" · ");
+    var metaParts = [c.city, c.phone];
+    if (opts && opts.showIndustry) metaParts.unshift(c.industry);
+    meta.textContent = metaParts.filter(Boolean).join(" · ");
     el.appendChild(meta);
 
     var st = statusOf(o);
@@ -246,11 +309,36 @@
       el.appendChild(pill);
     }
 
-    if (o && o.note) {
-      var noteEl = document.createElement("p");
-      noteEl.className = "note-shown";
-      noteEl.textContent = "“" + o.note + "”";
-      el.appendChild(noteEl);
+    var cb = callbackState(o);
+    if (cb) {
+      var cbEl = document.createElement("p");
+      cbEl.className = "callback-line " + (cb.due ? "due" : "scheduled");
+      cbEl.textContent = cb.due
+        ? (cb.overdueDays > 0
+            ? "⏰ Overdue " + cb.overdueDays + (cb.overdueDays === 1 ? " day" : " days")
+            : "⏰ Due today")
+        : "📅 Call back " + fmtDate(cb.at);
+      el.appendChild(cbEl);
+    }
+
+    // Full note history, newest first; latest entry stands out.
+    var notes = notesOf(o);
+    if (notes.length) {
+      var stack = document.createElement("div");
+      stack.className = "card-notes";
+      for (var i = notes.length - 1; i >= 0; i--) {
+        var line = document.createElement("p");
+        line.className = "note-line" + (i === notes.length - 1 ? " latest" : "");
+        if (notes[i].ts) {
+          var dt = document.createElement("span");
+          dt.className = "note-date";
+          dt.textContent = fmtDate(notes[i].ts);
+          line.appendChild(dt);
+        }
+        line.appendChild(document.createTextNode(notes[i].text));
+        stack.appendChild(line);
+      }
+      el.appendChild(stack);
     }
 
     var actions = document.createElement("div");
@@ -296,19 +384,49 @@
   var sheetSub = document.getElementById("sheetSub");
   var stepInterested = document.getElementById("stepInterested");
   var noteInput = document.getElementById("noteInput");
-  var draft = { company: null, answered: null, interested: null };
+  var noteHistoryEl = document.getElementById("noteHistory");
+  var chipsEl = document.getElementById("callbackChips");
+  var callbackDateEl = document.getElementById("callbackDate");
+  var callbackCurrentEl = document.getElementById("callbackCurrent");
+  var draft = { company: null, answered: null, interested: null, callbackAt: null };
+
+  // Preset chips land at noon local time N days out, so "due" math is stable
+  // across DST and the same preset re-tapped maps to the same timestamp.
+  function presetTs(days) { return startOfToday() + days * DAY + 12 * 3600000; }
 
   function openSheet(company) {
     var existing = loadOutcomes()[company.id] || {};
     draft = {
       company: company,
       answered: existing.answered || null,
-      interested: existing.interested || null
+      interested: existing.interested || null,
+      callbackAt: existing.callbackAt || null
     };
     sheetSub.textContent = company.name + " · " + company.phone;
-    noteInput.value = existing.note || "";
+    noteInput.value = "";
+    callbackDateEl.hidden = true;
+    callbackDateEl.value = "";
+    renderNoteHistory(existing);
     syncSheet();
     backdrop.hidden = false;
+  }
+
+  function renderNoteHistory(existing) {
+    noteHistoryEl.innerHTML = "";
+    var notes = notesOf(existing);
+    noteHistoryEl.hidden = !notes.length;
+    for (var i = notes.length - 1; i >= 0; i--) {
+      var line = document.createElement("p");
+      line.className = "note-line" + (i === notes.length - 1 ? " latest" : "");
+      if (notes[i].ts) {
+        var dt = document.createElement("span");
+        dt.className = "note-date";
+        dt.textContent = fmtDate(notes[i].ts);
+        line.appendChild(dt);
+      }
+      line.appendChild(document.createTextNode(notes[i].text));
+      noteHistoryEl.appendChild(line);
+    }
   }
 
   function closeSheet() {
@@ -320,6 +438,56 @@
     stepInterested.hidden = draft.answered !== "yes";
     setActive("[data-answered]", "answered");
     setActive("[data-interested]", "interested");
+    syncChips();
+  }
+
+  function syncChips() {
+    var presets = [1, 2, 3, 7];
+    chipsEl.querySelectorAll(".chip").forEach(function (btn) {
+      var v = btn.getAttribute("data-cb");
+      var active = false;
+      if (draft.callbackAt) {
+        if (v === "custom") {
+          active = presets.every(function (n) { return presetTs(n) !== draft.callbackAt; });
+        } else {
+          active = presetTs(parseInt(v, 10)) === draft.callbackAt;
+        }
+      }
+      btn.classList.toggle("active", active);
+    });
+    callbackCurrentEl.hidden = !draft.callbackAt;
+    if (draft.callbackAt) {
+      callbackCurrentEl.textContent =
+        "📅 Call back " + new Date(draft.callbackAt).toDateString().slice(0, 10) +
+        " — tap the chip again to clear";
+    }
+  }
+
+  chipsEl.querySelectorAll(".chip").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var v = btn.getAttribute("data-cb");
+      if (btn.classList.contains("active")) {
+        draft.callbackAt = null;
+        callbackDateEl.hidden = true;
+        syncChips();
+        return;
+      }
+      if (v === "custom") {
+        callbackDateEl.hidden = false;
+        if (callbackDateEl.value) applyCustomDate();
+        return;
+      }
+      callbackDateEl.hidden = true;
+      draft.callbackAt = presetTs(parseInt(v, 10));
+      syncChips();
+    });
+  });
+  callbackDateEl.addEventListener("change", applyCustomDate);
+  function applyCustomDate() {
+    if (!callbackDateEl.value) return;
+    var p = callbackDateEl.value.split("-");
+    draft.callbackAt = new Date(+p[0], +p[1] - 1, +p[2], 12).getTime();
+    syncChips();
   }
 
   function setActive(selector, key) {
@@ -345,10 +513,16 @@
 
   document.getElementById("saveOutcome").addEventListener("click", function () {
     if (!draft.company) return closeSheet();
+    var notes = notesOf(loadOutcomes()[draft.company.id]).slice();
+    var text = noteInput.value.trim();
+    if (text) notes.push({ text: text, ts: Date.now() });
     saveOutcome(draft.company.id, {
       answered: draft.answered,
       interested: draft.answered === "yes" ? draft.interested : null,
-      note: noteInput.value.trim()
+      notes: notes,
+      // Legacy mirror of the latest note, so old localStorage mirrors stay coherent.
+      note: notes.length ? notes[notes.length - 1].text : "",
+      callbackAt: draft.callbackAt
     });
     closeSheet();
     toast("Logged ✓");

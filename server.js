@@ -73,6 +73,13 @@ app.use(express.static(__dirname));
 // --- boot ----------------------------------------------------------------
 var PORT = process.env.PORT || 3000;
 ensureDir();
-app.listen(PORT, function () {
+var server = app.listen(PORT, function () {
   console.log("Outreach Dialer listening on " + PORT + " — data at " + DATA_FILE);
+});
+
+// Railway sends SIGTERM on redeploy; exit 0 so it's a clean stop, not a "crash".
+process.on("SIGTERM", function () {
+  server.close(function () {
+    process.exit(0);
+  });
 });
